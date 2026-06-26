@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08252e">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nage">
+<title>Crawl eau libre · Cap swimrun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --deep:#08252e;
+    --lake:#0e3a45;
+    --lake-2:#14525f;
+    --aqua:#6fd6c9;
+    --surface:#bfede6;
+    --air:#f0b860;
+    --foam:#e9f5f2;
+    --mist:#8fb0ae;
+    --line:rgba(111,214,201,.18);
+    --display:'Bricolage Grotesque',sans-serif;
+    --body:'Spline Sans',sans-serif;
+    --mono:'Spline Sans Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--deep);
+    color:var(--foam);
+    font-family:var(--body);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--aqua);color:var(--deep)}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:34px 22px 0;
+    background:linear-gradient(180deg,#0a2e38 0%,var(--deep) 100%);
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:.72rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--aqua);
+    display:flex;align-items:center;gap:9px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--aqua);display:inline-block}
+  .hero h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(2.5rem,11vw,4.2rem);
+    line-height:.96;
+    letter-spacing:-.02em;
+    margin:18px 0 6px;
+  }
+  .hero h1 .below{color:var(--aqua)}
+  .hero .lede{
+    color:var(--mist);
+    font-size:1rem;
+    max-width:42ch;
+    margin-bottom:30px;
+  }
+  .wave-wrap{position:relative;height:64px;margin:0 -22px;line-height:0}
+  .wave-wrap svg{display:block;width:200%;height:64px}
+  .w1{animation:drift 14s linear infinite}
+  .w2{animation:drift 9s linear infinite reverse;opacity:.5}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- PRINCIPES ---------- */
+  .principes{
+    background:var(--lake);
+    padding:26px 22px 30px;
+  }
+  .sec-label{
+    font-family:var(--mono);
+    font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--mist);margin-bottom:16px;
+  }
+  .princ-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .princ{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 14px 16px;
+    background:rgba(111,214,201,.04);
+  }
+  .princ .num{font-family:var(--mono);font-size:.7rem;color:var(--aqua)}
+  .princ h3{font-family:var(--display);font-weight:700;font-size:1.05rem;margin:4px 0 3px}
+  .princ p{font-size:.82rem;color:var(--mist);line-height:1.4}
+
+  /* ---------- BLOCS RIBBON ---------- */
+  .arc{padding:30px 22px 6px}
+  .arc h2{font-family:var(--display);font-weight:700;font-size:1.4rem;letter-spacing:-.01em;margin-bottom:4px}
+  .arc .sub{color:var(--mist);font-size:.9rem;margin-bottom:20px}
+  .blocs{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+  .bloc-row{
+    display:flex;align-items:center;gap:14px;
+    border-left:3px solid var(--bc,var(--aqua));
+    padding:9px 0 9px 14px;
+  }
+  .bloc-row .wks{font-family:var(--mono);font-size:.72rem;color:var(--mist);min-width:70px}
+  .bloc-row .bt{font-family:var(--display);font-weight:600;font-size:1rem}
+  .bloc-row .bd{color:var(--mist);font-size:.82rem;display:block}
+
+  /* ---------- WEEK NAV ---------- */
+  .weeknav{
+    position:sticky;top:0;z-index:20;
+    background:rgba(8,37,46,.92);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:12px 14px;
+    display:flex;gap:8px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .weeknav::-webkit-scrollbar{display:none}
+  .wchip{
+    flex:0 0 auto;
+    font-family:var(--mono);font-size:.82rem;font-weight:500;
+    color:var(--mist);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 15px;
+    cursor:pointer;
+    transition:all .18s ease;
+    white-space:nowrap;
+  }
+  .wchip[data-bloc] .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .wchip:hover{color:var(--foam);border-color:var(--aqua)}
+  .wchip.active{background:var(--aqua);color:var(--deep);border-color:var(--aqua);font-weight:600}
+  .wchip.active .dot{background:var(--deep)!important}
+
+  /* ---------- WEEK PANEL ---------- */
+  .panel{padding:24px 22px 10px;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .wk-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+  .wk-head .big{font-family:var(--display);font-weight:800;font-size:2.6rem;letter-spacing:-.03em;line-height:1;color:var(--bcur,var(--aqua))}
+  .wk-head .theme{font-family:var(--display);font-weight:600;font-size:1.25rem;line-height:1.05}
+  .wk-bloc{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mist);margin-bottom:18px}
+  .focus{
+    border:1px solid var(--line);
+    border-left:3px solid var(--air);
+    border-radius:0 12px 12px 0;
+    background:rgba(240,184,96,.06);
+    padding:12px 16px;margin-bottom:24px;
+  }
+  .focus .lab{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--air);margin-bottom:3px}
+  .focus p{font-size:.95rem}
+
+  .session{
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin-bottom:16px;
+    overflow:hidden;
+    background:rgba(20,82,95,.18);
+  }
+  .ses-head{
+    display:flex;align-items:center;gap:12px;
+    padding:15px 16px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .check{
+    flex:0 0 auto;width:24px;height:24px;border-radius:50%;
+    border:1.5px solid var(--mist);
+    display:flex;align-items:center;justify-content:center;
+    transition:all .18s ease;
+  }
+  .check svg{width:13px;height:13px;opacity:0;transform:scale(.5);transition:all .18s ease}
+  .session.done .check{background:var(--aqua);border-color:var(--aqua)}
+  .session.done .check svg{opacity:1;transform:scale(1)}
+  .ses-head .tag{font-family:var(--mono);font-size:.68rem;color:var(--aqua);letter-spacing:.08em}
+  .ses-head .title{font-family:var(--display);font-weight:600;font-size:1.08rem;flex:1;line-height:1.15}
+  .session.done .title{color:var(--mist);text-decoration:line-through;text-decoration-color:var(--line)}
+  .chev{flex:0 0 auto;color:var(--mist);transition:transform .25s ease}
+  .session.open .chev{transform:rotate(180deg)}
+  .ses-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .session.open .ses-body{max-height:1400px}
+  .ses-inner{padding:0 16px 18px}
+
+  .cue{
+    font-style:italic;color:var(--surface);font-size:.9rem;
+    padding:11px 14px;margin-bottom:16px;
+    border-radius:10px;background:rgba(111,214,201,.07);
+  }
+  .cue::before{content:"\201C";font-family:var(--display);font-size:1.3rem;color:var(--aqua);margin-right:2px}
+  .cue::after{content:"\201D";font-family:var(--display);font-size:1.3rem;color:var(--aqua)}
+
+  .part{margin-bottom:15px}
+  .part:last-child{margin-bottom:0}
+  .part .plab{
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--aqua);margin-bottom:7px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .part .plab::after{content:"";flex:1;height:1px;background:var(--line)}
+  .part ul{list-style:none}
+  .part li{
+    font-size:.9rem;padding:5px 0 5px 18px;position:relative;color:var(--foam);
+    border-bottom:1px solid rgba(111,214,201,.07);
+  }
+  .part li:last-child{border-bottom:none}
+  .part li::before{content:"";position:absolute;left:0;top:13px;width:6px;height:6px;border-radius:50%;background:var(--lake-2);border:1px solid var(--aqua)}
+  .part li b{font-family:var(--mono);font-weight:600;color:var(--surface);font-size:.86rem}
+
+  .lac{
+    border:1px dashed rgba(111,214,201,.35);
+    border-radius:14px;
+    padding:16px;margin:6px 0 4px;
+    background:rgba(8,37,46,.5);
+  }
+  .lac .lab{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--aqua);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .lac .lab svg{width:14px;height:14px}
+  .lac p{font-size:.9rem;color:var(--surface)}
+
+  /* ---------- EDUCATIFS ---------- */
+  .glossary{padding:26px 22px 40px}
+  .glossary h2{font-family:var(--display);font-weight:700;font-size:1.4rem;margin-bottom:4px}
+  .glossary .sub{color:var(--mist);font-size:.9rem;margin-bottom:18px}
+  .edu{border-bottom:1px solid var(--line)}
+  .edu summary{
+    list-style:none;cursor:pointer;
+    padding:14px 2px;
+    display:flex;align-items:center;gap:12px;
+    font-family:var(--display);font-weight:600;font-size:1.02rem;
+  }
+  .edu summary::-webkit-details-marker{display:none}
+  .edu summary .plus{margin-left:auto;color:var(--aqua);font-size:1.3rem;transition:transform .2s ease;line-height:1}
+  .edu[open] summary .plus{transform:rotate(45deg)}
+  .edu .edu-d{padding:0 2px 16px 36px;color:var(--mist);font-size:.9rem}
+  .edu .ec{display:inline-flex;width:24px;height:24px;border-radius:7px;background:rgba(111,214,201,.12);color:var(--aqua);align-items:center;justify-content:center;font-family:var(--mono);font-size:.72rem;flex:0 0 auto}
+
+  footer{padding:26px 22px 40px;border-top:1px solid var(--line);color:var(--mist);font-size:.8rem}
+  footer b{color:var(--surface);font-weight:600}
+
+  @media (min-width:760px){
+    .hero,.principes,.arc,.glossary,.panel{padding-left:max(22px,calc((100vw - 720px)/2));padding-right:max(22px,calc((100vw - 720px)/2))}
+    .weeknav{padding-left:max(14px,calc((100vw - 720px)/2));padding-right:max(14px,calc((100vw - 720px)/2))}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto}
+  }
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:2px;border-radius:6px}
+  .backlink{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);text-decoration:none;transition:color .2s;margin-bottom:6px}
+  .backlink:hover{color:var(--aqua)}
+  .backlink svg{width:14px;height:14px}
+  .hero{padding-top:calc(34px + env(safe-area-inset-top))}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a href="./index.html" class="backlink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Nage</a>
+  <div class="eyebrow">Programme · 6 semaines</div>
+  <h1>Crawl eau libre<br><span class="below">cap swimrun</span></h1>
+  <p class="lede">Pas de mur, pas de repos, on entre dans l'eau le souffle court. On travaille la glisse, l'orientation et la respiration — pas la vitesse pure.</p>
+  <div class="wave-wrap" aria-hidden="true">
+    <svg viewBox="0 0 1200 64" preserveAspectRatio="none">
+      <path class="w2" fill="#14525f" d="M0,30 C150,55 300,5 600,30 C900,55 1050,5 1200,30 L1200,64 L0,64 Z M1200,30 C1350,55 1500,5 1800,30 C2100,55 2250,5 2400,30 L2400,64 L1200,64 Z"/>
+      <path class="w1" fill="#08252e" d="M0,38 C200,18 400,58 600,38 C800,18 1000,58 1200,38 L1200,64 L0,64 Z M1200,38 C1400,18 1600,58 1800,38 C2000,18 2200,58 2400,38 L2400,64 L1200,64 Z"/>
+    </svg>
+  </div>
+</header>
+
+<section class="principes">
+  <div class="sec-label">Le fil rouge</div>
+  <div class="princ-grid">
+    <div class="princ"><div class="num">01</div><h3>Glisser long</h3><p>Horizontal, hanches hautes, tête dans l'axe. Réduire les freins d'abord.</p></div>
+    <div class="princ"><div class="num">02</div><h3>Tourner d'un bloc</h3><p>Épaules et hanches ensemble. La puissance vient du dos, pas du bras.</p></div>
+    <div class="princ"><div class="num">03</div><h3>Accrocher l'eau</h3><p>Coude haut, avant-bras vertical, pousse jusqu'à la hanche.</p></div>
+    <div class="princ"><div class="num">04</div><h3>Expirer dans l'eau</h3><p>Souffle long et continu. Jamais de blocage, surtout essoufflé.</p></div>
+    <div class="princ"><div class="num">05</div><h3>Viser léger</h3><p>Sighting yeux à fleur d'eau, hanches hautes. Respirer juste après.</p></div>
+  </div>
+</section>
+
+<section class="arc">
+  <h2>L'arc en 3 blocs</h2>
+  <p class="sub">Chaque bloc prépare le suivant. Le bassin sert le technique, le lac valide le transfert.</p>
+  <div class="blocs">
+    <div class="bloc-row" style="--bc:#6fd6c9"><span class="wks">S1 – S2</span><span><span class="bt">Fondations</span><span class="bd">Position, glisse, appui coude haut, expiration continue.</span></span></div>
+    <div class="bloc-row" style="--bc:#8fd0e8"><span class="wks">S3 – S4</span><span><span class="bt">Spécifique eau libre</span><span class="bd">Sighting, respiration bilatérale, nager droit et long sans s'arrêter.</span></span></div>
+    <div class="bloc-row" style="--bc:#f0b860"><span class="wks">S5 – S6</span><span><span class="bt">Spécifique swimrun</span><span class="bd">Nage essoufflée, combi simulée, enchaînements course-nage.</span></span></div>
+  </div>
+</section>
+
+<nav class="weeknav" id="weeknav" aria-label="Choix de la semaine"></nav>
+
+<main class="panel" id="panel"></main>
+
+<section class="glossary">
+  <h2>Les éducatifs</h2>
+  <p class="sub">Les drills cités dans les séances, en clair.</p>
+  <div id="eduList"></div>
+</section>
+
+<footer>
+  <p><b>Repères d'allure.</b> Tout est en allure souple à régulière : tu dois pouvoir tenir une respi /3 sans dette. Si tu pars en dette, ralentis — l'objectif est l'économie, pas le chrono.</p>
+  <br>
+  <p>Les distances supposent un bassin de 25 m. Adapte librement selon le créneau et la fatigue. Garde tes jambes pour la course.</p>
+</footer>
+
+<script>
+const blocColors = {1:'#6fd6c9',2:'#8fd0e8',3:'#f0b860'};
+const blocNames = {1:'Bloc 1 · Fondations',2:'Bloc 2 · Eau libre',3:'Bloc 3 · Swimrun'};
+
+const weeks = [
+  {
+    n:1, bloc:1, theme:"S'allonger & expirer",
+    focus:"Pousser la poitrine, hanches hautes, tête dans le prolongement de la colonne — supprimer l'effet frein.",
+    sessions:[
+      { tag:"Séance A", title:"Glisse & alignement", cue:"La tête suit la colonne, regard vers le fond.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple, expiration continue par le nez","<b>4×50 m</b> (25 éducatif / 25 nage) · récup 15\""]},
+          {l:"Technique", items:["<b>6×50 m</b> rattrapé décalé · glisse la plus longue possible · récup 15\"","<b>4×25 m</b> poings fermés · sentir l'appui avant-bras"]},
+          {l:"Corps de séance", items:["<b>8×50 m</b> nage complète, respi /3 · récup 20\" · focus tête basse + hanches hautes"]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple, allongement maximal"]}
+        ]},
+      { tag:"Séance B", title:"Appui coude haut", cue:"Passe le bras par-dessus le tonneau, pousse jusqu'à la hanche.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> éducatif au choix · récup 15\""]},
+          {l:"Technique", items:["<b>6×50 m</b> appui coude haut, avant-bras vertical · récup 20\""]},
+          {l:"Corps de séance", items:["<b>4×100 m</b> continu, allure régulière /3 · récup 30\"","<b>4×50 m</b> progressifs (finir un peu plus vite) · récup 20\""]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]}
+    ]
+  },
+  {
+    n:2, bloc:1, theme:"Tourner d'un bloc",
+    focus:"Le roulis vient des hanches autant que des épaules. Allonge ta ligne à chaque traction.",
+    sessions:[
+      { tag:"Séance A", title:"Roulis & rotation", cue:"Un seul bloc épaules-hanches, pas deux mouvements séparés.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> rattrapé décalé · récup 15\""]},
+          {l:"Technique", items:["<b>6×50 m</b> nage à 6 appuis/côté, rotation exagérée · récup 20\"","<b>4×25 m</b> nage sur le côté (un bras tendu, respi à l'air) "]},
+          {l:"Corps de séance", items:["<b>6×75 m</b> nage complète /3 · récup 20\" · focus rotation","<b>4×50 m</b> souples"]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]},
+      { tag:"Séance B", title:"Premières distances continues", cue:"Régularité avant tout : même allure du début à la fin.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>6×50 m</b> (alterné éducatif / nage) · récup 15\""]},
+          {l:"Corps de séance", items:["<b>3×200 m</b> continu /3, allure stable · récup 30\""]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]},
+      { lac:true, text:"Première sortie lac courte. Longe la rive, eau à hauteur, juste t'habituer au milieu : température, absence de ligne, repères visuels. Zéro objectif de perf." }
+    ]
+  },
+  {
+    n:3, bloc:2, theme:"Lever les yeux",
+    focus:"Sighting style crocodile : relève juste les yeux, garde les hanches hautes, respire juste après le regard.",
+    sessions:[
+      { tag:"Séance A", title:"Sighting & bilatérale", cue:"Yeux à fleur d'eau, pas toute la tête — sinon les jambes plongent.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> éducatif · récup 15\""]},
+          {l:"Technique", items:["<b>8×50 m</b> avec 2-3 sightings/longueur, point fixe au mur · récup 20\"","<b>6×50 m</b> respi bilatérale stricte (3-5-3-5) · récup 15\""]},
+          {l:"Corps de séance", items:["<b>6×100 m</b> /3 avec 2 sightings par 25 m · récup 25\""]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]},
+      { tag:"Séance B", title:"Nager long sans mur", cue:"Pas de pause au mur : enchaîne, gère ton allure.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> bilatérale · récup 15\""]},
+          {l:"Corps de séance", items:["<b>1×400 m</b> continu, sighting toutes les 6-8 brasses · récup 45\"","<b>1×300 m</b> continu bilatérale · récup 45\"","<b>1×200 m</b> continu, finir fluide"]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]}
+    ]
+  },
+  {
+    n:4, bloc:2, theme:"Tenir la distance",
+    focus:"Nager longtemps sans s'arrêter, allure eau libre stable. La respiration bilatérale devient un réflexe.",
+    sessions:[
+      { tag:"Séance A", title:"Fractions longues", cue:"Respire du côté que tu veux : tu dois savoir faire les deux.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>6×50 m</b> sighting + bilatérale · récup 15\""]},
+          {l:"Corps de séance", items:["<b>4×150 m</b> /3 bilatérale + sighting · récup 20\"","<b>8×25 m</b> alterné (1 vite souple / 1 lent) · récup 15\""]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]},
+      { tag:"Séance B", title:"Le gros morceau continu", cue:"Allure de croisière : régulière, économe, jamais en dette.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> progressifs · récup 15\""]},
+          {l:"Corps de séance", items:["<b>1×800 m</b> continu (ou 2×400, récup 30\") · sighting régulier, bilatérale"]},
+          {l:"Retour au calme", items:["<b>150 m</b> très souple"]}
+        ]},
+      { lac:true, text:"Nage entre deux points fixes (arbre, bouée, ponton). Vérifie ta dérive en t'arrêtant : de combien t'es-tu écarté ? Choisis ton côté de respiration selon le vent et le soleil." }
+    ]
+  },
+  {
+    n:5, bloc:3, theme:"Nager essoufflé",
+    focus:"Entrer dans l'eau le souffle court et le reprendre en nageant. Expiration longue et continue, jamais de blocage.",
+    sessions:[
+      { tag:"Séance A", title:"Départs secs", cue:"L'air sort longuement dans l'eau dès le premier mouvement.",
+        parts:[
+          {l:"Échauffement", items:["<b>300 m</b> souple progressif","<b>4×50 m</b> sighting · récup 15\""]},
+          {l:"Corps de séance", items:["<b>6×100 m</b> en départ sec : avant chaque, <b>15 burpees</b> ou 20\" de gainage dynamique au bord, puis pars direct · récup 30\"","Focus : expiration continue, ne pas chercher l'air en panique"]},
+          {l:"Retour au calme", items:["<b>150 m</b> souple, respi libre"]}
+        ]},
+      { tag:"Séance B", title:"Combi simulée (pull buoy)", cue:"Battement quasi nul : c'est la portance de la combi, propulse aux bras.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> éducatif · récup 15\""]},
+          {l:"Corps de séance", items:["<b>4×200 m</b> pull buoy, battement minimal, /3 bilatérale · récup 30\"","<b>4×50 m</b> sighting sans pull · récup 20\""]},
+          {l:"Retour au calme", items:["<b>100 m</b> souple"]}
+        ]}
+    ]
+  },
+  {
+    n:6, bloc:3, theme:"Enchaîner & valider",
+    focus:"Passer de la course à la nage sans cassure, en combi et chaussures. Sensations et fluidité avant le chrono.",
+    sessions:[
+      { tag:"Séance A", title:"Brick course-nage", cue:"Arrive dans l'eau cardio haut, calme la respiration sur les 25 premiers mètres.",
+        parts:[
+          {l:"Format (plan d'eau idéal)", items:["<b>4 tours</b> de [ course 400 m + nage 200 m ] enchaînés","Sortie de l'eau en courant à chaque tour, sans marcher"]},
+          {l:"Variante bassin", items:["<b>4×</b> [ 3' course/footing dehors + 150 m nage immédiate ] · transition la plus rapide possible"]},
+          {l:"Retour au calme", items:["<b>200 m</b> nage très souple"]}
+        ]},
+      { tag:"Séance B", title:"Affûtage & sensations", cue:"Tout doit être facile : tu cherches la glisse, pas la fatigue.",
+        parts:[
+          {l:"Échauffement", items:["<b>200 m</b> souple","<b>4×50 m</b> éducatif · récup 15\""]},
+          {l:"Corps de séance", items:["<b>2×300 m</b> continu fluide, sighting léger · récup 45\"","<b>4×25 m</b> départs vifs souples"]},
+          {l:"Retour au calme", items:["<b>150 m</b> très souple"]}
+        ]},
+      { lac:true, text:"Test final : mini-swimrun. 2 à 3 segments de nage (150–300 m) entrecoupés de course, en combi + chaussures. Sighting réel sur bouée ou repère, sorties de l'eau en courant. C'est ta répétition générale." }
+    ]
+  }
+];
+
+const educatifs = [
+  {k:"RD", t:"Rattrapé décalé", d:"Une main attend l'autre devant, mais tu relances la traction juste avant que les mains se touchent. Travaille la glisse et l'appui sans créer le temps mort du rattrapé strict."},
+  {k:"PF", t:"Poings fermés", d:"Nager les poings serrés quelques longueurs : tu ne peux plus t'appuyer sur la main, tu apprends donc à accrocher l'eau avec l'avant-bras. Effet net dès que tu rouvres les mains."},
+  {k:"CH", t:"Appui coude haut", d:"Main entrée et tendue devant, tu plies le coude en gardant l'avant-bras vertical — comme passer le bras par-dessus un tonneau. Maximum de surface vers l'arrière, poussée jusqu'à la hanche."},
+  {k:"SC", t:"Sighting crocodile", d:"Pour nager droit sans ligne : relève juste les yeux à fleur d'eau, vise un point fixe, repose la tête. L'inspiration vient juste après le regard, pas en même temps. Garde les hanches hautes pendant le coup d'œil."},
+  {k:"BL", t:"Respiration bilatérale", d:"Respirer des deux côtés (typiquement tous les 3 temps). Indispensable en eau libre pour respirer du côté abrité du vent, des vagues ou du soleil. Habitue aussi à une légère restriction d'air."},
+  {k:"PB", t:"Pull buoy = combi", d:"Le pull buoy entre les cuisses relève le bas du corps et coupe le battement : ça reproduit la portance de la combinaison. Tu apprends à propulser uniquement avec les bras."},
+  {k:"DS", t:"Départ sec", d:"Un effort bref hors de l'eau (burpees, gainage, course) juste avant de partir nager, pour reproduire l'entrée dans l'eau essoufflé du swimrun. La clé : expiration longue, jamais de blocage respiratoire."},
+  {k:"RB", t:"Roulis", d:"Rotation du corps autour de son axe à chaque traction, ~30-45° de chaque côté, hanches et épaules d'un seul bloc. Allonge la ligne, donne de la puissance (le dos travaille) et facilite la respiration."}
+];
+
+let openSession = {}; // weekIndex -> session index ouverte
+let doneState = {};    // "w-s" -> bool (en mémoire, se réinitialise au rechargement)
+
+const nav = document.getElementById('weeknav');
+const panel = document.getElementById('panel');
+
+function buildNav(){
+  weeks.forEach((w,i)=>{
+    const b=document.createElement('button');
+    b.className='wchip'+(i===0?' active':'');
+    b.dataset.bloc=w.bloc;
+    b.innerHTML=`<span class="dot" style="background:${blocColors[w.bloc]}"></span>S${w.n}`;
+    b.setAttribute('aria-label',`Semaine ${w.n} — ${w.theme}`);
+    b.onclick=()=>selectWeek(i,b);
+    nav.appendChild(b);
+  });
+}
+
+function selectWeek(i,btn){
+  document.querySelectorAll('.wchip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderWeek(i);
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+
+function renderWeek(i){
+  const w=weeks[i];
+  const col=blocColors[w.bloc];
+  let html=`
+    <div class="wk-head">
+      <span class="big" style="--bcur:${col}">S${w.n}</span>
+      <span class="theme">${w.theme}</span>
+    </div>
+    <div class="wk-bloc">${blocNames[w.bloc]}</div>
+    <div class="focus"><div class="lab">Focus de la semaine</div><p>${w.focus}</p></div>
+  `;
+  let sIndex=0;
+  w.sessions.forEach((s)=>{
+    if(s.lac){
+      html+=`<div class="lac"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2"><path d="M2 12s3-5 10-5 10 5 10 5"/><path d="M2 17s3-4 10-4 10 4 10 4"/></svg>Transfert lac</div><p>${s.text}</p></div>`;
+      return;
+    }
+    const key=`${i}-${sIndex}`;
+    const isOpen=openSession[i]===sIndex;
+    const isDone=doneState[key];
+    let parts='';
+    s.parts.forEach(p=>{
+      parts+=`<div class="part"><div class="plab">${p.l}</div><ul>${p.items.map(it=>`<li>${it}</li>`).join('')}</ul></div>`;
+    });
+    html+=`
+      <div class="session${isOpen?' open':''}${isDone?' done':''}" data-key="${key}" data-week="${i}" data-ses="${sIndex}">
+        <div class="ses-head">
+          <span class="check" role="checkbox" aria-checked="${isDone?'true':'false'}" tabindex="0" aria-label="Marquer comme fait">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#08252e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg>
+          </span>
+          <div class="tag">${s.tag}</div>
+          <div class="title">${s.title}</div>
+          <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>
+        </div>
+        <div class="ses-body"><div class="ses-inner">
+          <div class="cue">${s.cue}</div>
+          ${parts}
+        </div></div>
+      </div>`;
+    sIndex++;
+  });
+  panel.innerHTML=html;
+
+  // events
+  panel.querySelectorAll('.session').forEach(sec=>{
+    const wi=+sec.dataset.week, si=+sec.dataset.ses, key=sec.dataset.key;
+    sec.querySelector('.ses-head').addEventListener('click',(e)=>{
+      if(e.target.closest('.check')) return;
+      openSession[wi] = (openSession[wi]===si)? -1 : si;
+      sec.classList.toggle('open');
+    });
+    const chk=sec.querySelector('.check');
+    const toggle=(e)=>{e.stopPropagation();doneState[key]=!doneState[key];sec.classList.toggle('done');chk.setAttribute('aria-checked',doneState[key]?'true':'false');};
+    chk.addEventListener('click',toggle);
+    chk.addEventListener('keydown',(e)=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle(e);}});
+  });
+}
+
+function buildEdu(){
+  const el=document.getElementById('eduList');
+  educatifs.forEach(e=>{
+    const d=document.createElement('details');
+    d.className='edu';
+    d.innerHTML=`<summary><span class="ec">${e.k}</span>${e.t}<span class="plus">+</span></summary><div class="edu-d">${e.d}</div>`;
+    el.appendChild(d);
+  });
+}
+
+buildNav();
+renderWeek(0);
+buildEdu();
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
+</body>
+</html>

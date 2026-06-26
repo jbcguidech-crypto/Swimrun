@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Nage</title>
+<meta name="description" content="Programmes de natation eau libre & technique, séance par séance.">
+<meta name="theme-color" content="#08252e">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nage">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --deep:#08252e;--lake:#0e3a45;--lake-2:#14525f;
+    --aqua:#6fd6c9;--surface:#bfede6;--air:#f0b860;
+    --foam:#e9f5f2;--mist:#8fb0ae;--line:rgba(111,214,201,.18);
+    --display:'Bricolage Grotesque',sans-serif;--body:'Spline Sans',sans-serif;--mono:'Spline Sans Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--deep);color:var(--foam);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh;min-height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  ::selection{background:var(--aqua);color:var(--deep)}
+
+  .hero{position:relative;padding:54px 24px 0;text-align:center;background:linear-gradient(180deg,#0a2e38,var(--deep));overflow:hidden}
+  .mark{width:104px;height:104px;margin:0 auto 20px;display:block;filter:drop-shadow(0 12px 30px rgba(0,0,0,.45))}
+  .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(3rem,18vw,5rem);letter-spacing:-.03em;line-height:.9}
+  .hero .tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--aqua);margin-top:10px}
+  .hero .lede{color:var(--mist);font-size:.98rem;max-width:34ch;margin:18px auto 34px}
+  .wave-wrap{position:relative;height:56px;margin:0 -24px;line-height:0}
+  .wave-wrap svg{display:block;width:200%;height:56px}
+  .w1{animation:drift 14s linear infinite}.w2{animation:drift 9s linear infinite reverse;opacity:.5}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  .menu{padding:30px 24px 10px;max-width:560px;margin:0 auto}
+  .sec-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-bottom:16px}
+  a.card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:14px;background:rgba(20,82,95,.18);position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+  a.card:hover,a.card:focus-visible{border-color:var(--aqua);transform:translateY(-2px)}
+  a.card .kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--bc,var(--aqua))}
+  a.card h2{font-family:var(--display);font-weight:700;font-size:1.55rem;letter-spacing:-.01em;margin:6px 0 6px}
+  a.card p{color:var(--mist);font-size:.9rem;max-width:40ch}
+  a.card .arrow{position:absolute;top:22px;right:22px;color:var(--bc,var(--aqua));transition:transform .2s}
+  a.card:hover .arrow{transform:translateX(4px)}
+  a.card .stripe{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--bc,var(--aqua))}
+  a.card .meta{font-family:var(--mono);font-size:.72rem;color:var(--mist);margin-top:12px}
+
+  .install{display:none;margin:8px auto 0;max-width:560px;padding:0 24px}
+  .install button{width:100%;font-family:var(--display);font-weight:600;font-size:1rem;color:var(--deep);background:var(--aqua);border:none;border-radius:14px;padding:15px;cursor:pointer}
+  .install.show{display:block}
+
+  footer{padding:32px 24px 48px;max-width:560px;margin:0 auto;color:var(--mist);font-size:.82rem;text-align:center}
+  footer .a2hs{border:1px dashed var(--line);border-radius:14px;padding:14px 16px;margin-top:6px;text-align:left}
+  footer b{color:var(--surface)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:3px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img class="mark" src="./favicon.svg" alt="" aria-hidden="true">
+  <h1>Nage</h1>
+  <div class="tag">Une séance, une vague</div>
+  <p class="lede">Tes programmes natation, orientés eau libre et swimrun. Modulaires, séance par séance, consultables hors-ligne.</p>
+  <div class="wave-wrap" aria-hidden="true">
+    <svg viewBox="0 0 1200 56" preserveAspectRatio="none">
+      <path class="w2" fill="#14525f" d="M0,26 C150,48 300,4 600,26 C900,48 1050,4 1200,26 L1200,56 L0,56 Z M1200,26 C1350,48 1500,4 1800,26 C2100,48 2250,4 2400,26 L2400,56 L1200,56 Z"/>
+      <path class="w1" fill="#08252e" d="M0,34 C200,15 400,52 600,34 C800,15 1000,52 1200,34 L1200,56 L0,56 Z M1200,34 C1400,15 1600,52 1800,34 C2000,15 2200,52 2400,34 L2400,56 L1200,56 Z"/>
+    </svg>
+  </div>
+</header>
+
+<main class="menu">
+  <div class="sec-label">Choisis ton programme</div>
+
+  <a class="card" href="./swimrun.html" style="--bc:#6fd6c9">
+    <span class="stripe"></span>
+    <span class="arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    <div class="kicker">Programme · 6 semaines</div>
+    <h2>Cap swimrun</h2>
+    <p>Eau libre : glisse, sighting, respiration bilatérale, nage essoufflée. Du bassin au lac.</p>
+    <div class="meta">3 blocs · 2 séances/semaine · transferts lac</div>
+  </a>
+
+  <a class="card" href="./position.html" style="--bc:#f0b860">
+    <span class="stripe"></span>
+    <span class="arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    <div class="kicker">Module technique · 3 semaines</div>
+    <h2>Bloc Position</h2>
+    <p>Flotter haut, glisser loin. Deux leviers pour gagner des secondes au 100 m sans forcer.</p>
+    <div class="meta">Horizontalité · distance par coup · calculateur</div>
+  </a>
+</main>
+
+<div class="install" id="install">
+  <button id="installBtn">Installer Nage sur l'écran d'accueil</button>
+</div>
+
+<footer>
+  <p id="installed-note" style="display:none"><b>Nage est installée.</b> Lance-la depuis ton écran d'accueil.</p>
+  <div class="a2hs" id="ios-hint" style="display:none">
+    <b>Sur iPhone :</b> appuie sur le bouton Partager, puis « Sur l'écran d'accueil » pour installer Nage.
+  </div>
+  <p style="margin-top:14px">Les séances restent accessibles <b>hors-ligne</b> une fois l'app ouverte une première fois avec du réseau.</p>
+</footer>
+
+<script>
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+  // Bouton d'installation (Android/Chrome)
+  let deferred = null;
+  const wrap = document.getElementById('install');
+  const btn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferred = e; wrap.classList.add('show');
+  });
+  btn.addEventListener('click', async () => {
+    if (!deferred) return;
+    deferred.prompt();
+    await deferred.userChoice;
+    deferred = null; wrap.classList.remove('show');
+  });
+  window.addEventListener('appinstalled', () => {
+    wrap.classList.remove('show');
+    document.getElementById('installed-note').style.display = 'block';
+  });
+  // Astuce iOS (pas de beforeinstallprompt sur Safari)
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isIOS && !standalone) document.getElementById('ios-hint').style.display = 'block';
+</script>
+</body>
+</html>

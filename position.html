@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08252e">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nage">
+<title>Bloc Position · Flotter haut, glisser loin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --deep:#08252e;--lake:#0e3a45;--lake-2:#14525f;
+    --aqua:#6fd6c9;--surface:#bfede6;--air:#f0b860;
+    --foam:#e9f5f2;--mist:#8fb0ae;--line:rgba(111,214,201,.18);
+    --display:'Bricolage Grotesque',sans-serif;
+    --body:'Spline Sans',sans-serif;
+    --mono:'Spline Sans Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--deep);color:var(--foam);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--aqua);color:var(--deep)}
+
+  .hero{position:relative;padding:34px 22px 0;background:linear-gradient(180deg,#0a2e38,var(--deep));overflow:hidden}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--air);display:flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--air);display:inline-block}
+  .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,10vw,4rem);line-height:.96;letter-spacing:-.02em;margin:18px 0 6px}
+  .hero h1 .below{color:var(--aqua)}
+  .hero .lede{color:var(--mist);font-size:1rem;max-width:44ch;margin-bottom:30px}
+  .wave-wrap{position:relative;height:60px;margin:0 -22px;line-height:0}
+  .wave-wrap svg{display:block;width:200%;height:60px}
+  .w1{animation:drift 14s linear infinite}
+  .w2{animation:drift 9s linear infinite reverse;opacity:.5}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  section{padding:28px 22px}
+  .sec-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-bottom:16px}
+  h2{font-family:var(--display);font-weight:700;font-size:1.4rem;letter-spacing:-.01em;margin-bottom:4px}
+  .sub{color:var(--mist);font-size:.9rem;margin-bottom:20px}
+
+  /* levers */
+  .levers{background:var(--lake)}
+  .lever{border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:12px;background:rgba(111,214,201,.04)}
+  .lever .tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--aqua);display:flex;align-items:center;gap:8px}
+  .lever h3{font-family:var(--display);font-weight:700;font-size:1.3rem;margin:6px 0 8px}
+  .lever p{font-size:.92rem;color:var(--surface)}
+  .lever .why{font-size:.85rem;color:var(--mist);margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+
+  /* calculator */
+  .calc{background:rgba(20,82,95,.22);border:1px solid var(--line);border-radius:18px;padding:20px}
+  .calc .row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+  .field{flex:1;min-width:120px}
+  .field label{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mist);margin-bottom:6px}
+  .field input,.field select{width:100%;background:var(--deep);border:1px solid var(--line);border-radius:10px;color:var(--foam);font-family:var(--mono);font-size:1.1rem;padding:11px 12px;-webkit-appearance:none;appearance:none}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--aqua)}
+  .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236fd6c9' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  .calc .out{display:flex;gap:14px;flex-wrap:wrap}
+  .stat{flex:1;min-width:130px;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .stat .v{font-family:var(--display);font-weight:800;font-size:1.9rem;color:var(--aqua);line-height:1}
+  .stat .v small{font-size:.9rem;color:var(--mist);font-weight:500}
+  .stat .k{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mist);margin-top:6px}
+  .calc .hint{font-size:.82rem;color:var(--mist);margin-top:14px}
+  .calc .hint b{color:var(--surface)}
+
+  /* checklist */
+  .film{background:var(--lake)}
+  .clist{list-style:none}
+  .clist li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.92rem;cursor:pointer;user-select:none}
+  .clist li:last-child{border-bottom:none}
+  .cbox{flex:0 0 auto;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--mist);display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .cbox svg{width:13px;height:13px;opacity:0;transform:scale(.5);transition:all .18s}
+  .clist li.on .cbox{background:var(--aqua);border-color:var(--aqua)}
+  .clist li.on .cbox svg{opacity:1;transform:scale(1)}
+  .clist li.on .ctxt{color:var(--mist)}
+  .clist .ctxt b{color:var(--surface);font-family:var(--mono);font-size:.85rem;font-weight:600}
+
+  /* weeks */
+  .weeknav{position:sticky;top:0;z-index:20;background:rgba(8,37,46,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 14px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+  .weeknav::-webkit-scrollbar{display:none}
+  .wchip{flex:0 0 auto;font-family:var(--mono);font-size:.82rem;color:var(--mist);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;transition:all .18s;white-space:nowrap}
+  .wchip:hover{color:var(--foam);border-color:var(--aqua)}
+  .wchip.active{background:var(--aqua);color:var(--deep);border-color:var(--aqua);font-weight:600}
+
+  .panel{padding:24px 22px 10px;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .wk-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+  .wk-head .big{font-family:var(--display);font-weight:800;font-size:2.6rem;letter-spacing:-.03em;line-height:1;color:var(--aqua)}
+  .wk-head .theme{font-family:var(--display);font-weight:600;font-size:1.2rem;line-height:1.05}
+  .wk-goal{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);margin-bottom:18px}
+  .focus{border:1px solid var(--line);border-left:3px solid var(--air);border-radius:0 12px 12px 0;background:rgba(240,184,96,.06);padding:12px 16px;margin-bottom:24px}
+  .focus .lab{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--air);margin-bottom:3px}
+  .focus p{font-size:.95rem}
+
+  .session{border:1px solid var(--line);border-radius:16px;margin-bottom:16px;overflow:hidden;background:rgba(20,82,95,.18)}
+  .ses-head{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;user-select:none}
+  .ses-head .tag{font-family:var(--mono);font-size:.68rem;color:var(--aqua)}
+  .ses-head .title{font-family:var(--display);font-weight:600;font-size:1.06rem;flex:1;line-height:1.15}
+  .chev{color:var(--mist);transition:transform .25s}
+  .session.open .chev{transform:rotate(180deg)}
+  .ses-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .session.open .ses-body{max-height:1600px}
+  .ses-inner{padding:0 16px 18px}
+  .cue{font-style:italic;color:var(--surface);font-size:.9rem;padding:11px 14px;margin-bottom:16px;border-radius:10px;background:rgba(111,214,201,.07)}
+  .cue::before{content:"\201C";font-family:var(--display);color:var(--aqua)}
+  .cue::after{content:"\201D";font-family:var(--display);color:var(--aqua)}
+  .part{margin-bottom:15px}.part:last-child{margin-bottom:0}
+  .part .plab{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--aqua);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+  .part .plab::after{content:"";flex:1;height:1px;background:var(--line)}
+  .part ul{list-style:none}
+  .part li{font-size:.9rem;padding:5px 0 5px 18px;position:relative;border-bottom:1px solid rgba(111,214,201,.07)}
+  .part li:last-child{border-bottom:none}
+  .part li::before{content:"";position:absolute;left:0;top:13px;width:6px;height:6px;border-radius:50%;background:var(--lake-2);border:1px solid var(--aqua)}
+  .part li b{font-family:var(--mono);color:var(--surface);font-size:.86rem;font-weight:600}
+
+  /* drills */
+  .edu{border-bottom:1px solid var(--line)}
+  .edu summary{list-style:none;cursor:pointer;padding:14px 2px;display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:600;font-size:1.02rem}
+  .edu summary::-webkit-details-marker{display:none}
+  .edu summary .plus{margin-left:auto;color:var(--aqua);font-size:1.3rem;transition:transform .2s;line-height:1}
+  .edu[open] summary .plus{transform:rotate(45deg)}
+  .edu .edu-d{padding:0 2px 16px 36px;color:var(--mist);font-size:.9rem}
+  .edu .ec{display:inline-flex;width:26px;height:26px;border-radius:8px;background:rgba(111,214,201,.12);color:var(--aqua);align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;flex:0 0 auto}
+
+  footer{padding:26px 22px 40px;border-top:1px solid var(--line);color:var(--mist);font-size:.82rem}
+  footer b{color:var(--surface)}
+
+  @media (min-width:760px){
+    section,.panel{padding-left:max(22px,calc((100vw - 720px)/2));padding-right:max(22px,calc((100vw - 720px)/2))}
+    .weeknav{padding-left:max(14px,calc((100vw - 720px)/2));padding-right:max(14px,calc((100vw - 720px)/2))}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:2px;border-radius:6px}
+  .backlink{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);text-decoration:none;transition:color .2s;margin-bottom:6px}
+  .backlink:hover{color:var(--aqua)}
+  .backlink svg{width:14px;height:14px}
+  .hero{padding-top:calc(34px + env(safe-area-inset-top))}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a href="./index.html" class="backlink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Nage</a>
+  <div class="eyebrow">Module technique · 3 semaines</div>
+  <h1>Flotter haut<br><span class="below">glisser loin</span></h1>
+  <p class="lede">Le moteur, tu l'as. Ce qui te coûte des secondes au 100 m, c'est la position et la distance par coup. Trois semaines pour effacer le frein avant de chercher la vitesse.</p>
+  <div class="wave-wrap" aria-hidden="true">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path class="w2" fill="#14525f" d="M0,28 C150,52 300,4 600,28 C900,52 1050,4 1200,28 L1200,60 L0,60 Z M1200,28 C1350,52 1500,4 1800,28 C2100,52 2250,4 2400,28 L2400,60 L1200,60 Z"/>
+      <path class="w1" fill="#08252e" d="M0,36 C200,16 400,56 600,36 C800,16 1000,56 1200,36 L1200,60 L0,60 Z M1200,36 C1400,16 1600,56 1800,36 C2000,16 2200,56 2400,36 L2400,60 L1200,60 Z"/>
+    </svg>
+  </div>
+</header>
+
+<section class="levers">
+  <div class="sec-label">Les 2 seuls leviers du module</div>
+  <div class="lever">
+    <div class="tag">Levier 1 · le plus gros gain</div>
+    <h3>Horizontalité</h3>
+    <p>Tête basse (regard fond), poitrine qui appuie, hanches hautes, battement léger qui maintient les jambes en surface. Un corps plat glisse ; un corps cassé traîne une ancre.</p>
+    <p class="why">Pourquoi : à allure lente, ce sont les jambes qui coulent. Les remonter peut valoir 20 à 30 s/100 m, sans nager « plus fort ».</p>
+  </div>
+  <div class="lever">
+    <div class="tag">Levier 2 · l'efficacité</div>
+    <h3>Distance par coup</h3>
+    <p>Avancer plus loin à chaque traction plutôt que de brasser vite et court. On compte les coups, on cherche à les réduire à allure égale.</p>
+    <p class="why">Pourquoi : brasser vite agite l'eau sans avancer et explose le cardio. Moins de coups = nage plus économe, exactement ce qu'il faut en eau libre.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-label">Ton thermomètre</div>
+  <h2>Distance par coup</h2>
+  <p class="sub">Compte tes coups de bras sur une longueur de 25 m (un bras = un coup). Refais le test au début de chaque semaine et regarde le chiffre descendre.</p>
+  <div class="calc">
+    <div class="row">
+      <div class="field">
+        <label for="dist">Longueur testée</label>
+        <select id="dist"><option value="25">25 m</option><option value="50">50 m</option><option value="20">20 m</option></select>
+      </div>
+      <div class="field">
+        <label for="strokes">Coups comptés</label>
+        <input id="strokes" type="number" inputmode="numeric" min="1" max="120" value="22">
+      </div>
+    </div>
+    <div class="out">
+      <div class="stat"><div class="v" id="dps">1.14<small> m</small></div><div class="k">Distance / coup</div></div>
+      <div class="stat"><div class="v" id="rating">Correct</div><div class="k">Repère</div></div>
+    </div>
+    <p class="hint" id="chint"><b>Objectif du module :</b> grappiller 2 à 4 coups sur ta longueur de 25 m en gardant la même allure. C'est ça, le vrai progrès.</p>
+  </div>
+</section>
+
+<nav class="weeknav" id="weeknav" aria-label="Choix de la semaine"></nav>
+<main class="panel" id="panel"></main>
+
+<section>
+  <h2>Les éducatifs du module</h2>
+  <p class="sub">Les drills cités, en clair.</p>
+  <div id="eduList"></div>
+</section>
+
+<footer>
+  <p><b>Comment l'insérer.</b> Ce module se glisse avant — ou en parallèle — du programme 6 semaines. Garde 1 séance position par semaine même quand tu reprendras le volume : la technique se perd vite si on ne l'entretient pas.</p>
+  <br>
+  <p>Volumes modestes et drills à gogo, c'est voulu : à ce stade tu construis un geste, tu ne cherches pas la caisse. La fatigue dégrade la technique — dès que ça se casse, tu arrêtes la série.</p>
+</footer>
+
+<script>
+/* ---- calculator ---- */
+const dist=document.getElementById('dist'),strokes=document.getElementById('strokes');
+const dpsEl=document.getElementById('dps'),rateEl=document.getElementById('rating');
+function calc(){
+  const d=+dist.value, s=+strokes.value;
+  if(!s||s<1){dpsEl.innerHTML='—';rateEl.textContent='—';return;}
+  const dps=d/s;
+  dpsEl.innerHTML=dps.toFixed(2)+'<small> m</small>';
+  let r,c;
+  if(dps<0.9){r='À gagner';c='var(--air)';}
+  else if(dps<1.1){r='En route';c='var(--surface)';}
+  else if(dps<1.35){r='Correct';c='var(--aqua)';}
+  else{r='Belle glisse';c='var(--aqua)';}
+  rateEl.textContent=r;rateEl.style.color=c;
+}
+dist.addEventListener('change',calc);strokes.addEventListener('input',calc);calc();
+
+/* ---- weeks ---- */
+const weeks=[
+  {n:1,theme:"Flotter haut",goal:"Objectif : sentir un corps plat",
+   focus:"Cette semaine, une seule obsession : remonter les hanches et garder la tête dans l'eau. La vitesse, on s'en fiche.",
+   sessions:[
+    {tag:"Séance A",title:"La position, rien d'autre",cue:"Appuie la poitrine vers le bas, les hanches remontent toutes seules.",
+     parts:[
+      {l:"Activation",items:["<b>5 min</b> nage très souple, juste sentir l'eau"]},
+      {l:"Drills position",items:["<b>6×15 m</b> fusée (poussée mur, corps gainé, compter la glisse) · récup large","<b>6×25 m</b> battement ventral bras tendus devant, tête dans l'eau, expire par le nez · récup 20\"","<b>4×25 m</b> battement sur le côté (un bras tendu, joue posée sur l'épaule) · changer de côté"]},
+      {l:"Assemblage",items:["<b>6×25 m</b> nage complète ultra souple, focus hanches hautes · récup 20\""]},
+      {l:"Fin",items:["<b>100 m</b> souple"]}
+    ]},
+    {tag:"Séance B",title:"Tête & gainage",cue:"La nuque longue, le regard au fond : la tête lourde fait couler tout le reste.",
+     parts:[
+      {l:"Activation",items:["<b>5 min</b> souple"]},
+      {l:"Drills position",items:["<b>8×15 m</b> fusée, viser plus loin à chaque poussée","<b>6×25 m</b> battement planche tenue devant, tête immergée, lever la tête seulement pour respirer · récup 20\"","<b>4×25 m</b> nage 3 coups / pause en glisse (rattrapé décalé lent)"]},
+      {l:"Assemblage",items:["<b>8×25 m</b> nage souple, regard vers le fond en permanence · récup 15\""]},
+      {l:"Fin",items:["<b>100 m</b> souple"]}
+    ]}
+   ]},
+  {n:2,theme:"Glisser loin",goal:"Objectif : moins de coups, même allure",
+   focus:"On garde la position acquise et on ajoute la glisse. Compte tes coups au début, vise à en retirer un ou deux d'ici la fin de séance.",
+   sessions:[
+    {tag:"Séance A",title:"Compter pour avancer",cue:"Allonge l'avant, glisse sur l'appui — la vitesse viendra de la distance, pas de la fréquence.",
+     parts:[
+      {l:"Activation",items:["<b>5 min</b> souple","<b>4×15 m</b> fusée (rappel position)"]},
+      {l:"Test",items:["<b>2×25 m</b> en comptant tes coups · note le chiffre"]},
+      {l:"Drills glisse",items:["<b>6×25 m</b> rattrapé décalé, glisse la plus longue tenable · récup 20\"","<b>6×25 m</b> nage en réduisant les coups de 1 à 2 vs ton test, même allure · récup 25\""]},
+      {l:"Fin",items:["<b>4×25 m</b> nage libre fluide + <b>100 m</b> souple"]}
+    ]},
+    {tag:"Séance B",title:"Échelle de coups",cue:"Chaque longueur, un coup de moins : tu forces la glisse sans y penser.",
+     parts:[
+      {l:"Activation",items:["<b>5 min</b> souple + <b>4×15 m</b> fusée"]},
+      {l:"Drills glisse",items:["<b>2×25 m</b> poings fermés (appui avant-bras) · récup 20\"","<b>5×25 m</b> échelle descendante : chaque 25 m, un coup de moins que le précédent · récup 25\"","<b>4×25 m</b> rattrapé décalé focus allonge"]},
+      {l:"Assemblage",items:["<b>6×25 m</b> nage complète, chercher le compromis glisse/allure · récup 20\""]},
+      {l:"Fin",items:["<b>100 m</b> souple"]}
+    ]}
+   ]},
+  {n:3,theme:"Assembler",goal:"Objectif : garder les deux en nageant long",
+   focus:"Position + glisse réunies, sur des distances plus longues. Le but : que le bon geste tienne quand la longueur s'allonge.",
+   sessions:[
+    {tag:"Séance A",title:"Tenir le geste",cue:"Dès que la position se casse ou que les coups remontent, c'est le signal pour ralentir.",
+     parts:[
+      {l:"Activation",items:["<b>6 min</b> souple","<b>4×25 m</b> rattrapé décalé"]},
+      {l:"Corps",items:["<b>4×50 m</b> nage en comptant les coups, viser stable sur les 2 longueurs · récup 25\"","<b>4×50 m</b> alterné 25 drill glisse / 25 nage · récup 20\""]},
+      {l:"Continu",items:["<b>2×100 m</b> souple, focus hanches hautes du début à la fin · récup 40\""]},
+      {l:"Fin",items:["<b>100 m</b> souple"]}
+    ]},
+    {tag:"Séance B",title:"Test & bilan",cue:"Compare au test de la semaine 1 — le chiffre a bougé, c'est ça la preuve.",
+     parts:[
+      {l:"Activation",items:["<b>6 min</b> souple + <b>4×15 m</b> fusée"]},
+      {l:"Re-test",items:["<b>3×25 m</b> en comptant les coups · compare au départ du module"]},
+      {l:"Corps",items:["<b>6×50 m</b> nage fluide, position + glisse tenues · récup 20\"","<b>1×200 m</b> continu souple, geste propre prioritaire sur l'allure"]},
+      {l:"Fin",items:["<b>150 m</b> très souple"]}
+    ]}
+   ]}
+];
+
+const educatifs=[
+  {k:"FUS",t:"Fusée (streamline)",d:"Pousse contre le mur (ou départ gainé), bras tendus serrés au-dessus de la tête, corps aligné, et glisse sans bouger jusqu'à l'arrêt. Compte la distance parcourue : c'est ta référence d'hydrodynamisme. Sers-toi-en pour sentir la position idéale du corps."},
+  {k:"BV",t:"Battement ventral bras tendus",d:"Sur le ventre, bras allongés devant (avec ou sans planche tenue à bout de bras), tête immergée, tu bats des jambes souplement depuis la hanche. Tu ne lèves la tête que pour respirer. Travaille la ligne du corps et l'horizontalité."},
+  {k:"BC",t:"Battement sur le côté",d:"Allongé sur le flanc, un bras tendu devant, l'autre le long du corps, joue posée vers l'épaule, battement léger. Apprend l'équilibre latéral et la position gainée en rotation — la base du roulis."},
+  {k:"RD",t:"Rattrapé décalé",d:"Une main attend devant, tu relances juste avant le contact des mains. Allonge la glisse et la phase d'appui sans créer de temps mort. Idéal pour réduire le nombre de coups."},
+  {k:"PF",t:"Poings fermés",d:"Nager poings serrés : impossible de s'appuyer sur la main, tu accroches donc avec l'avant-bras. Rouvre les mains après et la prise d'eau paraît énorme."},
+  {k:"EC",t:"Échelle de coups",d:"Sur des longueurs égales, retire un coup de bras à chaque longueur. Tu es obligé d'allonger la glisse et de pousser plus complet pour tenir la distance. Le meilleur drill pour la distance par coup."}
+];
+
+let openSession={};
+const nav=document.getElementById('weeknav'),panel=document.getElementById('panel');
+weeks.forEach((w,i)=>{
+  const b=document.createElement('button');
+  b.className='wchip'+(i===0?' active':'');
+  b.textContent='Semaine '+w.n;
+  b.onclick=()=>{document.querySelectorAll('.wchip').forEach(c=>c.classList.remove('active'));b.classList.add('active');render(i);b.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});};
+  nav.appendChild(b);
+});
+function render(i){
+  const w=weeks[i];
+  let html=`<div class="wk-head"><span class="big">S${w.n}</span><span class="theme">${w.theme}</span></div>
+    <div class="wk-goal">${w.goal}</div>
+    <div class="focus"><div class="lab">Focus de la semaine</div><p>${w.focus}</p></div>`;
+  w.sessions.forEach((s,si)=>{
+    const open=openSession[i]===si;
+    let parts='';
+    s.parts.forEach(p=>{parts+=`<div class="part"><div class="plab">${p.l}</div><ul>${p.items.map(it=>`<li>${it}</li>`).join('')}</ul></div>`;});
+    html+=`<div class="session${open?' open':''}" data-w="${i}" data-s="${si}">
+      <div class="ses-head"><div class="tag">${s.tag}</div><div class="title">${s.title}</div>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></div>
+      <div class="ses-body"><div class="ses-inner"><div class="cue">${s.cue}</div>${parts}</div></div>
+    </div>`;
+  });
+  panel.innerHTML=html;
+  panel.querySelectorAll('.session').forEach(sec=>{
+    sec.querySelector('.ses-head').addEventListener('click',()=>{
+      const wi=+sec.dataset.w,si=+sec.dataset.s;
+      openSession[wi]=(openSession[wi]===si)?-1:si;
+      sec.classList.toggle('open');
+    });
+  });
+}
+render(0);
+
+const el=document.getElementById('eduList');
+educatifs.forEach(e=>{const d=document.createElement('details');d.className='edu';d.innerHTML=`<summary><span class="ec">${e.k}</span>${e.t}<span class="plus">+</span></summary><div class="edu-d">${e.d}</div>`;el.appendChild(d);});
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
+</body>
+</html>
