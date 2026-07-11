@@ -1,7 +1,7 @@
 // swimrun — service worker
-const CACHE = 'swimrun-v5';
+const CACHE = 'swimrun-v6';
 const SHELL = [
-  './','./index.html','./swim.html','./run.html','./position.html',
+  './','./index.html','./swim.html','./run.html','./position.html','./endurance.html',
   './manifest.webmanifest','./favicon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'
 ];
 self.addEventListener('install', (e) => {
