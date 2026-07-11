@@ -124,11 +124,16 @@
   <div class="card">
     <div class="ftp-row">
       <div class="txt">
-        <span class="cap">FTP (watts)</span>
-        <p class="hint">Test : 20 min à fond × 0,95. Renseigné, les séances home trainer s'affichent en watts réels.</p>
+        <span class="cap">FTP (watts) — optionnelle</span>
+        <p class="hint">Test 20 min à fond × 0,95, ou test rampe guidé (MyWhoosh gratuit, app Elite). Sans FTP, tout s'affiche en sensations : aucun capteur nécessaire.</p>
       </div>
       <input id="ftpIn" type="number" inputmode="numeric" min="50" max="500" placeholder="—" onchange="setFtp(this.value)" aria-label="FTP en watts">
     </div>
+  </div>
+  <div class="card">
+    <span class="cap">Repères sensation — le test de la parole</span>
+    <p class="hint" style="margin-top:8px"><b style="color:var(--aqua)">Facile</b> : conversation complète possible (3-4/10). <b style="color:var(--air)">Soutenu</b> : phrases courtes seulement (6-7/10). <b style="color:var(--air)">Vif</b> : quelques mots max (8-9/10). Valable route, sentier et home trainer, sans montre ni capteur.</p>
+    <p class="hint" style="margin-top:10px"><b style="color:var(--surface)">Dans l'eau</b>, remplace la parole par la respiration : <b style="color:var(--aqua)">facile</b> = respiration tous les 3 temps confortable, expiration complète ; <b style="color:var(--air)">soutenu</b> = le 2 temps devient nécessaire ; <b style="color:var(--air)">vif</b> = essoufflé en fin de série. Et au mur : peux-tu parler normalement, ou seulement après plusieurs respirations ?</p>
   </div>
 </section>
 
@@ -213,69 +218,80 @@ function renderEnForm(){
 }
 
 /* ---------- Générateur ---------- */
+var FX={
+  z2:'aisance : conversation complète possible (3-4/10)',
+  ss:'soutenu : phrases courtes seulement (6-7/10)',
+  vo2:'vif : quelques mots max (8-9/10)'
+};
+function tgt(k,lo,hi){return STORE.ftp?FX[k]+' · '+(lo===hi?lo:lo+'-'+hi)+' % FTP'+pw(lo,hi):FX[k];}
+var FXN={
+  z2:'respiration 3 temps confortable — au mur tu parles normalement (3-4/10)',
+  ss:'le 2 temps devient nécessaire — au mur, phrases courtes (6-7/10)',
+  vo2:'essoufflé en fin de série — au mur, quelques mots après 2-3 respirations (8/10)'
+};
 function buildEndurance(disc,intn,mins){
   var name=discLabel(disc);
   if(disc==='brick'){
     if(enBrickMode==='indoor'){
       var run=Math.min(20,Math.round(mins*0.35)),ht=Math.max(15,mins-run-4);
-      if(intn==='facile')return {title:'Brick indoor · HT + course',sub:mins+' min · Z2',blocks:[
-        'Home trainer Z2 '+ht+' min à 65-75 % FTP'+pw(65,75)+' · ERG activé',
+      if(intn==='facile')return {title:'Brick indoor · HT + course',sub:mins+' min · facile',blocks:[
+        'Home trainer '+ht+' min en '+tgt('z2',65,75),
         'Transition < 2 min — chaussures prêtes à côté du vélo',
-        'Course facile '+run+' min — cadence haute, laisse les jambes revenir',
+        'Course facile '+run+' min — cadence haute, tu dois pouvoir parler',
         'C\'est l\'enchaînement qui compte, pas l\'allure']};
       return {title:'Brick indoor · HT + course',sub:mins+' min · dur',blocks:[
         'Échauffement HT 10 min progressif',
-        Math.max(2,Math.round((ht-10)/12))+' × 8 min à 88-92 % FTP'+pw(88,92)+' / 3 min souple · ERG activé',
+        Math.max(2,Math.round((ht-10)/12))+' × 8 min '+tgt('ss',88,92)+' / 3 min souple',
         'Transition < 2 min',
-        'Course tempo '+Math.min(15,run)+' min — allure soutenue sur jambes lourdes',
+        'Course tempo '+Math.min(15,run)+' min sur jambes lourdes — phrases courtes (7/10)',
         'Retour au calme 5 min marche/trot']};
     }
     if(intn==='facile'){
       var r1=Math.round(mins*0.35),sw=Math.round(mins*0.25),r2=Math.max(10,mins-r1-sw-4);
-      return {title:'Brick swimrun · nage + course',sub:mins+' min · Z2 + transitions',blocks:[
-        'Course facile '+r1+' min en tenue de swimrun',
+      return {title:'Brick swimrun · nage + course',sub:mins+' min · facile + transitions',blocks:[
+        'Course facile '+r1+' min en tenue de swimrun — conversation possible',
         'Transition rapide — pull-buoy, lunettes, entre dans l\'eau sans traîner',
-        'Nage continue '+sw+' min allure régulière (chaussures aux pieds si tu testes le matos)',
+        'Nage continue '+sw+' min — '+FXN.z2,
         'Transition — repars en courant immédiatement, jambes lourdes',
         'Course facile '+r2+' min, retrouve ta foulée']};
     }
     var reps=Math.max(2,Math.round((mins-15)/13));
     return {title:'Brick swimrun · nage + course',sub:mins+' min · effort course',blocks:[
       'Échauffement 10 min course facile + mobilité épaules',
-      reps+' × (course 8 min soutenue → transition chrono → nage 4 min vive)',
+      reps+' × (course 8 min soutenue — phrases courtes → transition chrono → nage 4 min vive, 2 temps nécessaire)',
       'Transitions chronométrées : chaque seconde compte le jour J',
       'Retour au calme 5 min trot + nage souple']};
   }
   if(disc==='ht'){
     if(intn==='facile'){
-      return {title:'Home trainer · Z2',sub:mins+' min · 65-75 % FTP'+pw(65,75),blocks:[
-        'Mise en route 8-10 min en montant doucement vers Z2',
-        'Z2 continu ~'+Math.max(15,mins-15)+' min à 65-75 % FTP'+pw(65,75)+' · cadence ~90 tr/min · ERG activé',
-        'Reste vraiment facile — tu dois pouvoir parler. Un film/podcast aide',
+      return {title:'Home trainer · facile',sub:mins+' min · Z2',blocks:[
+        'Mise en route 8-10 min en montant doucement',
+        'Continu ~'+Math.max(15,mins-15)+' min en '+tgt('z2',65,75)+' · cadence ~90 tr/min',
+        'Reste vraiment facile : si tu ne peux plus discuter, ralentis. Un film/podcast aide',
         'Retour au calme 5 min souple']};}
     var w,f;
-    if(mins>=75){w=12;f='3 × 15 min à 88-92 % FTP'+pw(88,92)+' (sweet spot) / 5 min souple entre les blocs · ERG activé';}
-    else if(mins>=60){w=12;f='2 × 20 min à ~90 % FTP'+pw(90,90)+' (sweet spot) / 5-8 min souple entre les blocs · ERG activé';}
-    else if(mins>=45){w=10;f='3 × 10 min à 90-94 % FTP'+pw(90,94)+' / 5 min souple · ERG activé';}
-    else {w=12;f='2-3 blocs de 10 × (30 s fort / 15 s souple) · 5 min entre blocs · ERG coupé, réponds naturellement';}
-    return {title:'Home trainer · dur',sub:mins+' min · '+(mins>=45?'sweet spot':'30/15 VO2max'),blocks:[
+    if(mins>=75){w=12;f='3 × 15 min '+tgt('ss',88,92)+' / 5 min souple entre les blocs';}
+    else if(mins>=60){w=12;f='2 × 20 min '+tgt('ss',90,90)+' / 5-8 min souple entre les blocs';}
+    else if(mins>=45){w=10;f='3 × 10 min '+tgt('ss',90,94)+' / 5 min souple';}
+    else {w=12;f='2-3 blocs de 10 × (30 s quasi à fond (9/10) / 15 s souple) · 5 min entre blocs';}
+    return {title:'Home trainer · dur',sub:mins+' min · '+(mins>=45?'sweet spot':'30/15'),blocks:[
       'Échauffement progressif '+w+' min avec 2-3 accélérations courtes',f,'Retour au calme 8 min souple']};
   }
   if(intn==='facile'){
     var b;
-    if(disc==='nage') b=['Échauffement souple 200-300 m','Nage continue facile ~'+Math.max(10,mins-10)+' min, allure conversationnelle','Quelques éducatifs si tu veux (battements, rattrapé)','Retour au calme 100-200 m'];
-    else if(disc==='corde'){var r=Math.max(3,Math.round(mins/4));b=[r+' × 2 min sauts souples / 1 min repos','Rebonds bas, rythme régulier'];}
-    else b=['Mise en route progressive 5-8 min',name+' facile en continu, allure conversationnelle (~'+Math.max(10,mins-8)+' min)','Tu finis en te sentant capable de continuer'];
-    return {title:name+' · facile',sub:mins+' min · Z2 continu',blocks:b};
+    if(disc==='nage') b=['Échauffement souple 200-300 m','Nage continue facile ~'+Math.max(10,mins-10)+' min — '+FXN.z2,'Quelques éducatifs si tu veux (battements, rattrapé)','Retour au calme 100-200 m'];
+    else if(disc==='corde'){var r=Math.max(3,Math.round(mins/4));b=[r+' × 2 min sauts souples / 1 min repos','Rebonds bas, rythme régulier, respiration calme'];}
+    else b=['Mise en route progressive 5-8 min',name+' facile en continu ~'+Math.max(10,mins-8)+' min — conversation complète possible (3-4/10)','Tu finis en te sentant capable de continuer'];
+    return {title:name+' · facile',sub:mins+' min · continu',blocks:b};
   }
-  var warm=12,cool=8,work=Math.max(8,mins-warm-cool);var fmt;
-  if(disc==='nage') fmt=Math.max(4,Math.round(work/2.5))+' × 100 m vif / 30 s repos';
-  else if(disc==='corde') fmt=Math.max(5,Math.round(work/1.5))+' × 45 s rapide / 45 s repos';
+  var warm=12,cool=8,work=Math.max(8,mins-warm-cool);var fmt,fk='ss';
+  if(disc==='nage'){fmt=Math.max(4,Math.round(work/2.5))+' × 100 m vif / 30 s repos';fk='vo2';}
+  else if(disc==='corde'){fmt=Math.max(5,Math.round(work/1.5))+' × 45 s rapide / 45 s repos';fk='vo2';}
   else if(disc==='velo') fmt=Math.max(4,Math.round(work/6))+' × 3 min fort / 3 min souple';
   else if(disc==='skirando') fmt=Math.max(3,Math.round(work/8))+' × 4 min soutenu / récup en descente ou pause';
   else if(disc==='rando') fmt=Math.max(4,Math.round(work/6))+' × 3 min en côte soutenu / redescente récup';
   else fmt=Math.max(4,Math.round(work/4))+' × 2 min soutenu / 2 min récup';
-  return {title:name+' · dur',sub:mins+' min · intervalles',blocks:['Échauffement progressif '+warm+' min',fmt,'Retour au calme '+cool+' min']};
+  return {title:name+' · dur',sub:mins+' min · intervalles',blocks:['Échauffement progressif '+warm+' min',fmt,'Cible sur les efforts — '+(disc==='nage'?FXN[fk]:FX[fk]),'Retour au calme '+cool+' min']};
 }
 
 var lastEnGen=null;
