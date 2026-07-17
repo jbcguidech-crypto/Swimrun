@@ -240,13 +240,9 @@ body{padding-bottom:86px}
   <div class="mini">
     <div class="cap">Temps disponible</div>
     <div class="chips" id="progTime"></div>
-    <div class="cap" style="margin-top:15px;margin-bottom:6px">Raccourcis</div>
+    <div class="cap" style="margin-top:15px;margin-bottom:6px">Type de séance</div>
     <div class="chips" id="pplShortcuts"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:13px">
-      <span class="cap" style="margin:0">Groupes à travailler</span>
-      <button class="allbtn" id="muscleAllBtn" onclick="toggleAllMuscles()">Tout décocher</button>
-    </div>
-    <div class="chips" id="progFocus"></div>
+    <p id="pplCover" style="margin:8px 0 0;font-size:12px;color:var(--ink-soft)"></p>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:15px">
       <span class="cap" style="margin:0">Matériel</span>
       <button class="allbtn" id="equipAllBtn" onclick="toggleAllEquip()">Tout décocher</button>
@@ -409,7 +405,7 @@ body{padding-bottom:86px}
 </div>
 
 <script>
-const APP_VERSION='v24';
+const APP_VERSION='v25';
 function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
 document.getElementById('appVer').textContent=APP_VERSION;
 const EQUIPS=[['pdc','Poids du corps'],['barre','Barre'],['trx','TRX'],['anneaux','Anneaux'],['box','Box'],['kb','Kettlebell'],['gilet','Gilet lesté'],['mb','Med ball'],['slider','Plaquettes']];
@@ -830,10 +826,18 @@ function updateCfgSum(){
   el.textContent=timeLabel(timeCfg)+' · '+who;
 }
 function muscleLabel(k){const m=MUSCLES.find(x=>x[0]===k);return m?m[1]:k;}
+const PRESET_COVER={
+  push:'Pousser : pectoraux + épaules — triceps travaillés via pompes, dips et HSPU.',
+  pull:'Tirer : dos & trapèzes + biceps + avant-bras (grip) — l\'assurance du terrain et de la nage.',
+  legs:'Jambes : quadriceps + ischios + fessiers + mollets — le châssis course et montagne.',
+  core:'Tronc : gainage, anti-rotation, hollow — le lien nage-course.',
+  full:'Tout le corps : les 10 groupes en rotation, rien n\'est oublié.'};
 function renderFocusChips(){
-  document.getElementById('progFocus').innerHTML=MUSCLES.map(([k,l])=>`<button class="chip ${focusParts.has(k)?'on':''}" onclick="toggleMuscle('${k}')">${l}</button>`).join('');
-  const ab=document.getElementById('muscleAllBtn');if(ab)ab.textContent=focusParts.size>0?'Tout décocher':'Tout cocher';
-  renderShortcuts();updateCfgSum();
+  renderShortcuts();
+  const cur=matchPreset();
+  const pc=document.getElementById('pplCover');
+  if(pc)pc.textContent=cur?PRESET_COVER[cur]:'';
+  updateCfgSum();
 }
 const PRESETS={push:['pecs','epaules'],pull:['dos','biceps','avantbras'],legs:['quads','ischios','fessiers','mollets'],core:['abdos'],full:MUSCLES.map(m=>m[0])};
 const PRESET_LABEL={push:'Push',pull:'Pull',legs:'Legs',core:'Abdos & Gainage',full:'Full'};
@@ -841,8 +845,8 @@ function eqSet(arr){return arr.length===focusParts.size&&arr.every(x=>focusParts
 function matchPreset(){return Object.keys(PRESETS).find(p=>eqSet(PRESETS[p]))||null;}
 function renderShortcuts(){const cur=matchPreset();const el=document.getElementById('pplShortcuts');if(el)el.innerHTML=Object.keys(PRESET_LABEL).map(p=>`<button class="chip ${cur===p?'on':''}" onclick="setPreset('${p}')">${PRESET_LABEL[p]}</button>`).join('');}
 function setPreset(p){focusParts=new Set(PRESETS[p]);renderFocusChips();}
-function toggleMuscle(k){if(focusParts.has(k))focusParts.delete(k);else focusParts.add(k);renderFocusChips();}
-function toggleAllMuscles(){if(focusParts.size>0)focusParts.clear();else MUSCLES.forEach(([k])=>focusParts.add(k));renderFocusChips();}
+
+
 let STORE=load();
 (function(){try{var r=localStorage.getItem('swimrun_endurance_v1');if(!r)return;var d=JSON.parse(r);if(!d)return;
 if(!STORE.ftp&&d.ftp)STORE.ftp=d.ftp;
