@@ -1,5 +1,5 @@
 // swimrun — service worker
-const CACHE = 'swimrun-v20';
+const CACHE = 'swimrun-v23';
 const SHELL = [
   './','./index.html',
   './manifest.webmanifest','./favicon.svg','./icon-192.png','./icon-512.png','./icon-192-maskable.png','./icon-512-maskable.png','./apple-touch-icon.png'

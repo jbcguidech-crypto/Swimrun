@@ -144,6 +144,14 @@ header{padding:22px 0 6px;display:flex;justify-content:space-between;align-items
 .hist .he{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line);color:var(--ink-soft)}
 .hist .he:last-child{border:none}
 .note{font-size:11.5px;color:var(--ink-soft);text-align:center;margin:18px 4px 4px;line-height:1.45}
+.trend{display:flex;gap:7px;align-items:flex-end;height:110px;padding:4px 2px 0}
+.trend .tc{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;gap:0;min-width:0}
+.trend .tc .bars{display:flex;flex-direction:column-reverse;gap:2px;justify-content:flex-start}
+.trend .tc i{display:block;border-radius:3px;min-height:4px}
+.trend .tc .tl{font-size:9px;color:var(--ink-soft);text-align:center;margin-top:5px;white-space:nowrap;overflow:hidden}
+.trend .tc.cur .tl{color:var(--accent);font-weight:700}
+.trend-leg{display:flex;gap:12px;margin-top:10px;font-size:10.5px;color:var(--ink-soft);flex-wrap:wrap}
+.trend-leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 </style>
 <style>
 #installBar{position:fixed;top:0;left:0;right:0;z-index:90;background:#3E6E55;color:#fff;display:none;align-items:center;gap:10px;padding:11px 14px;font-size:13.5px;box-shadow:0 2px 12px rgba(0,0,0,.18)}
@@ -211,7 +219,7 @@ body{padding-bottom:86px}
 <div id="installBar"><b id="installTxt">Installer l'app sur ton écran d'accueil</b><button id="installBtn">Installer</button><button id="installClose" aria-label="Fermer">✕</button></div>
 <div class="wrap">
   <header>
-    <div class="logo">WOD 2.0<small>monter en niveau, mouvement par mouvement</small></div>
+    <div class="logo">Endurance 2.0<small>le moteur, la force, la mobilité</small></div>
     <div style="display:flex;align-items:flex-start;gap:7px;flex:none">
       <span class="ver" id="appVer">—</span>
       <button class="hbtn" onclick="openSettings()" aria-label="Réglages">⚙</button>
@@ -222,6 +230,7 @@ body{padding-bottom:86px}
 
   <div class="sect">Séance</div>
   <button class="gen-btn" style="margin-top:0" onclick="generateSession()">Générer une séance de progression</button>
+  <button class="gen-btn" style="margin-top:8px;background:var(--card);color:var(--accent);border:1.5px solid var(--accent)" onclick="spinForce()">🎲 Séance surprise — groupe au hasard</button>
   <div id="genOut" style="margin-top:12px"></div>
 
   <button class="cat-h" id="cfgHead" onclick="toggleCfg()" style="margin-top:12px">
@@ -250,6 +259,17 @@ body{padding-bottom:86px}
   <div id="trackList"></div>
   <p class="note">Touche une catégorie pour la déplier, puis un mouvement pour voir l'échelle, journaliser tes séries et progresser.</p>
 
+  <div class="sect">Mobilité & prévention</div>
+  <div class="mini">
+    <div class="cap">Zone</div>
+    <div class="chips" id="mobZone"></div>
+    <div class="cap" style="margin-top:15px">Durée</div>
+    <div class="chips" id="mobTime"></div>
+    <button class="gen-btn" onclick="generateMob()">Générer la routine</button>
+  </div>
+  <div id="mobOut"></div>
+  <p class="note">À faire souvent, même 5 min — le soir, avant une séance, en récup. Ne compte pas dans tes objectifs : c'est de l'entretien, pas de l'entraînement. Jamais de douleur, respiration nasale calme.</p>
+
   </div>
 
   <div class="page on" id="page-semaine">
@@ -262,6 +282,12 @@ body{padding-bottom:86px}
 
     <div class="sect">Objectifs</div>
     <div id="weekBody"></div>
+
+    <div class="sect">Tendance · 8 semaines</div>
+    <div class="mini">
+      <div class="trend" id="trendOut"></div>
+      <div class="trend-leg"><span><i style="background:var(--accent)"></i>Cardio/WOD facile</span><span><i style="background:var(--warn)"></i>Dur</span><span><i style="background:var(--ink-soft)"></i>Force</span></div>
+    </div>
   </div>
 
   <div class="page" id="page-endurance">
@@ -383,7 +409,7 @@ body{padding-bottom:86px}
 </div>
 
 <script>
-const APP_VERSION='v20';
+const APP_VERSION='v23';
 function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
 document.getElementById('appVer').textContent=APP_VERSION;
 const EQUIPS=[['pdc','Poids du corps'],['barre','Barre'],['trx','TRX'],['anneaux','Anneaux'],['box','Box'],['kb','Kettlebell'],['gilet','Gilet lesté'],['mb','Med ball'],['slider','Plaquettes']];
@@ -839,7 +865,7 @@ function exportData(){
     const payload={app:'progression',version:1,exported:new Date().toISOString(),data:{progression_v1:localStorage.getItem('progression_v1')||JSON.stringify(STORE)}};
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     const url=URL.createObjectURL(blob);const a=document.createElement('a');
-    a.href=url;a.download='progression-sauvegarde-'+new Date().toISOString().slice(0,10)+'.json';
+    a.href=url;a.download='endurance2-sauvegarde-'+new Date().toISOString().slice(0,10)+'.json';
     document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   }catch(e){alert('Export impossible dans cet aperçu. Ouvre le fichier dans un vrai navigateur.');}
 }
@@ -1140,7 +1166,7 @@ renderChips();renderTimeChips();renderFocusChips();renderTracks();applyTheme();r
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.toggle('on',el.id==='page-'+p));
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===p));
-  if(p==='semaine')renderWeek();
+  if(p==='semaine'){renderWeek();renderTrend();}
   window.scrollTo(0,0);
 }
 
@@ -1338,10 +1364,18 @@ function logBenchDone(){
 }
 // ---- Roulette WOD ----
 var spinning=false;
+const BENCH_MIN={cindy:20,annie:10,helen:12,halfmurph:26,jackie:14,jt:14,fran:8,barbara:35,chelsea:30,angie:24,mary:20,nicole:20,eva:42,karen:11,murph:55,chad:75,michael:26,loredo:33,daniel:30,hansen:35,grace:5,isabel:5,diane:9,elizabeth:11,kelly:30,nancy:22,lynne:25,tabata:24,fgb:17,filthy50:32,chief:21,gijane:20,baseline:7,deathby:16,griff:13,maupin:35,ryan:25,nate:20,mcghee:18,randy:11,manion:36,badger:42,josh:16,helton:33,riley:55,kalsu:35,wittman:30,tellier:30,brenton:16,collin:35};
+function benchFitsTime(b){var m=BENCH_MIN[b.id];if(!m)return true;return m>=wodTime*0.6&&m<=wodTime*1.6;}
 function spinWod(){
   if(spinning)return;
   var avail=BENCH.filter(function(b){return !b.need||b.need.some(function(e){return equip.has(e);});});
   if(!avail.length)return;
+  var fit=avail.filter(benchFitsTime);
+  if(fit.length<3){
+    // trop peu de candidats dans la fenêtre : prendre les plus proches de la durée choisie
+    fit=avail.slice().sort(function(a,b){return Math.abs((BENCH_MIN[a.id]||wodTime)-wodTime)-Math.abs((BENCH_MIN[b.id]||wodTime)-wodTime);}).slice(0,6);
+  }
+  avail=fit;
   var recent=(STORE.endurance||[]).filter(function(e){return e.disc==='wod';}).slice(0,10).map(function(e){return e.note||'';});
   var pool=avail.filter(function(b){return !recent.some(function(n){return n.indexOf(b.name)>=0;});});
   if(!pool.length)pool=avail;
@@ -1359,6 +1393,8 @@ function spinWod(){
       spinning=false;
       buzz(20);
       showBench(pick.id);
+      var est=BENCH_MIN[pick.id];
+      if(est){var wo=document.getElementById('wodOut');if(wo)wo.insertAdjacentHTML('afterbegin','<div class="wk-hint" style="margin:0 2px 8px">🎲 Tiré pour ta fenêtre de '+wodTime+' min · durée estimée ≈ '+est+' min</div>');}
     }
   }
   el.scrollIntoView({behavior:'smooth'});
@@ -1530,7 +1566,7 @@ function renderCardioList(){
 
 document.getElementById('wodNote').addEventListener('keydown',function(e){if(e.key==='Enter')logWodDirect();});
 renderWodForm();renderBenchFilters();renderBench();renderEnList();
-renderCardioForm();renderCardioTime();renderCardioList();
+renderCardioForm();renderCardioTime();renderCardioList();renderMobForm();
 (function(){var fi=document.getElementById('ftpIn');if(fi&&STORE.ftp)fi.value=STORE.ftp;
 var cn=document.getElementById('cdNote');if(cn)cn.addEventListener('keydown',function(e){if(e.key==='Enter')logCardio();});})();
 
@@ -1539,6 +1575,26 @@ var lastGenSession=null;
 function isoWeek(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var day=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-day);var ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));var wn=Math.ceil(((d-ys)/86400000+1)/7);return d.getUTCFullYear()+'-W'+String(wn).padStart(2,'0');}
 function weekKeyOf(iso){return isoWeek(new Date(iso));}
 function curWeekKey(){return isoWeek(new Date());}
+function renderTrend(){
+  var el=document.getElementById('trendOut');if(!el)return;
+  var weeks=[];var now=new Date();
+  for(var i=7;i>=0;i--){var d=new Date(now);d.setDate(now.getDate()-7*i);weeks.push({key:isoWeek(d),lab:(function(x){var day=x.getDay()||7;var mon=new Date(x);mon.setDate(x.getDate()-day+1);return mon.getDate()+'/'+(mon.getMonth()+1);})(d)});}
+  var data=weeks.map(function(w){
+    var fac=0,dur=0,force=0;
+    (STORE.endurance||[]).forEach(function(e){if(weekKeyOf(e.iso)===w.key){if(e.int==='dur')dur++;else fac++;}});
+    (STORE.sessions||[]).forEach(function(s){if(weekKeyOf(s.iso)===w.key)force++;});
+    return {lab:w.lab,fac:fac,dur:dur,force:force,tot:fac+dur+force};
+  });
+  var mx=Math.max(4,Math.max.apply(null,data.map(function(x){return x.tot;})));
+  var H=78; // hauteur utile en px
+  el.innerHTML=data.map(function(x,i){
+    var u=H/mx;
+    var seg=function(n,color){return n>0?'<i style="height:'+Math.max(4,Math.round(n*u))+'px;background:'+color+'"></i>':'';};
+    var bars=seg(x.fac,'var(--accent)')+seg(x.dur,'var(--warn)')+seg(x.force,'var(--ink-soft)');
+    if(!x.tot)bars='<i style="height:3px;background:var(--line)"></i>';
+    return '<div class="tc'+(i===7?' cur':'')+'"><div class="bars">'+bars+'</div><div class="tl">'+x.lab+'</div></div>';
+  }).join('');
+}
 function weekRangeLabel(){var d=new Date();var day=d.getDay()||7;var mon=new Date(d);mon.setDate(d.getDate()-day+1);var sun=new Date(mon);sun.setDate(mon.getDate()+6);var f=function(x){return x.toLocaleDateString('fr-CH',{day:'numeric',month:'short'});};return f(mon)+' – '+f(sun);}
 function goals(){if(!STORE.goals)STORE.goals={force:2,endu:3};return STORE.goals;}
 function setGoal(k,d){var g=goals();g[k]=Math.max(0,Math.min(7,(g[k]||0)+d));save();renderWeek();}
@@ -1604,7 +1660,92 @@ function renderWeek(){
     '<div class="wk-hint">'+intHint+'</div></div>';
   el.innerHTML=top+force+endu+inten;
 }
-renderWeek();
+renderWeek();renderTrend();
+
+
+
+// ---- Séance force surprise : preset au hasard, durée respectée ----
+function spinForce(){
+  var keys=Object.keys(PRESETS);
+  var pick=keys[Math.floor(Math.random()*keys.length)];
+  focusParts=new Set(PRESETS[pick]);
+  renderFocusChips();
+  generateSession();
+  buzz(20);
+  var go=document.getElementById('genOut');
+  if(go){
+    go.insertAdjacentHTML('afterbegin','<div class="wk-hint" style="margin:0 2px 8px">🎲 Tirage : <b>'+PRESET_LABEL[pick]+'</b> · '+timeLabel(timeCfg)+'</div>');
+    go.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+// ---- Mobilité & prévention ----
+const MOB_ZONES=[
+ ['epaules','Épaules & thoracique',[
+  ['Cercles de bras amples','20 par sens, lents, amplitude maximale sans forcer'],
+  ['Dislocations (bâton ou serviette)','10-15, prise large, épaules basses'],
+  ['Ouverture thoracique au mur','avant-bras au mur, tourne la poitrine à l\'opposé · 30 s/côté'],
+  ['Rotations externes (serviette tendue)','2 × 12, coudes au corps, lent'],
+  ['Chat-vache centré thoracique','10 lents, bouge surtout le haut du dos'],
+  ['Étirement grand dorsal (mains sur support)','buste qui plonge, 30-40 s, respire dans les côtes']]],
+ ['hanches','Hanches & fessiers',[
+  ['90/90 assis, bascules lentes','8-10 par côté, buste droit'],
+  ['Fente basse (couch stretch doux)','30-40 s/côté, fessier serré, sans creuser les lombaires'],
+  ['Pigeon doux (ou allongé jambe croisée)','40 s/côté, relâche à l\'expiration'],
+  ['Cercles de hanche en quadrupédie','8 par sens et par jambe, amples et contrôlés'],
+  ['Squat profond tenu (tenir un appui si besoin)','45-60 s, talons au sol, dos long'],
+  ['Balancier de jambe avant-arrière','12/jambe, gainé, amplitude progressive']]],
+ ['chevilles','Chevilles & pieds',[
+  ['Flexion dorsale au mur','genou vers le mur sans lever le talon · 10-12/côté'],
+  ['Cercles de cheville en charge légère','10 par sens et par pied'],
+  ['Mollets excentriques sur marche','2 × 10, montée 2 pieds, descente lente 1 pied'],
+  ['Voûte plantaire : balle ou pouce','1 min/pied, pression tolérable'],
+  ['Marche talons puis pointes','20 m de chaque, pieds nus si possible'],
+  ['Équilibre unipodal yeux ouverts puis fermés','30 s/pied — la cheville du terrain irrégulier']]],
+ ['dos','Dos & tronc',[
+  ['Chat-vache complet','10 lents, synchronisés sur la respiration'],
+  ['Rotation thoracique en quadrupédie','8/côté, main derrière la tête, coude vers le ciel'],
+  ['Sphinx doux','45 s, fessiers relâchés, respire dans le ventre'],
+  ['Genoux tombés alternés (allongé)','10/côté, épaules au sol'],
+  ['Suspension passive (si barre)','2 × 20-30 s, épaules détendues — décompression'],
+  ['Gainage respiratoire (planche genoux)','3 × 20 s en expirant longuement']]],
+ ['poignets','Poignets & avant-bras',[
+  ['Cercles de poignets','15 par sens, doigts croisés'],
+  ['Extension paumes au sol, doigts vers toi','30 s, recule doucement les fesses'],
+  ['Dos des mains au sol','20-30 s, pression très progressive'],
+  ['Ouverture-fermeture des doigts','20, énergique'],
+  ['Étirement fléchisseurs bras tendu','20 s/côté, tire les doigts vers toi'],
+  ['Appuis progressifs en quadrupédie','bascules avant-arrière 10, prépare pompes et appuis']]],
+ ['complet','Routine complète',[]]];
+const MOB_TIMES=[5,8,12];
+var mobZone='epaules',mobTime=8;
+function setMobZone(z){mobZone=z;renderMobForm();}
+function setMobTime(t){mobTime=t;renderMobForm();}
+function renderMobForm(){
+  document.getElementById('mobZone').innerHTML=MOB_ZONES.map(function(z){return '<button class="chip '+(mobZone===z[0]?'on':'')+'" onclick="setMobZone(\''+z[0]+'\')">'+z[1]+'</button>';}).join('');
+  document.getElementById('mobTime').innerHTML=MOB_TIMES.map(function(t){return '<button class="chip '+(mobTime===t?'on':'')+'" onclick="setMobTime('+t+')">'+t+' min</button>';}).join('');
+}
+function generateMob(){
+  var pool;
+  if(mobZone==='complet'){
+    pool=[];
+    MOB_ZONES.forEach(function(z){if(z[2].length)pool.push(z[2][Math.floor(Math.random()*z[2].length)]);});
+  } else {
+    var z=MOB_ZONES.find(function(x){return x[0]===mobZone;});
+    pool=z[2].slice();
+  }
+  var n=mobTime===5?4:(mobTime===8?6:8);
+  // mélange léger puis coupe
+  for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t;}
+  var pick=pool.slice(0,Math.min(n,pool.length));
+  var per=Math.round(mobTime*60/pick.length);
+  var zl=MOB_ZONES.find(function(x){return x[0]===mobZone;})[1];
+  document.getElementById('mobOut').innerHTML='<div class="mini"><div style="font-weight:700;font-size:16px;margin-bottom:4px">Mobilité · '+escapeHtml(zl)+'</div>'
+    +'<div style="font-size:12px;color:var(--ink-soft);margin-bottom:8px">'+mobTime+' min · ~'+per+' s par exercice · lent, sans douleur</div>'
+    +pick.map(function(e,i){return '<div class="en-blk"><span class="bn">'+(i+1)+'</span><span><b>'+escapeHtml(e[0])+'</b><br><span style="color:var(--ink-soft);font-size:13px">'+escapeHtml(e[1])+'</span></span></div>';}).join('')
+    +'</div>';
+  buzz(15);
+}
 
 // ---- Ma séance du jour : l'app tranche ----
 function yesterdayHard(){
