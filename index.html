@@ -269,6 +269,7 @@ body{padding-bottom:86px}
   </div>
 
   <div class="page on" id="page-semaine">
+    <div id="backupHint"></div>
     <div class="wk-range" id="weekRange">—</div>
     <button class="gen-btn" style="margin:14px 0 0" onclick="generateToday()">⚡ Ma séance du jour</button>
     <div id="todayOut"></div>
@@ -405,7 +406,7 @@ body{padding-bottom:86px}
 </div>
 
 <script>
-const APP_VERSION='v25';
+const APP_VERSION='v26';
 function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
 document.getElementById('appVer').textContent=APP_VERSION;
 const EQUIPS=[['pdc','Poids du corps'],['barre','Barre'],['trx','TRX'],['anneaux','Anneaux'],['box','Box'],['kb','Kettlebell'],['gilet','Gilet lesté'],['mb','Med ball'],['slider','Plaquettes']];
@@ -871,6 +872,8 @@ function exportData(){
     const url=URL.createObjectURL(blob);const a=document.createElement('a');
     a.href=url;a.download='endurance2-sauvegarde-'+new Date().toISOString().slice(0,10)+'.json';
     document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    STORE.lastExport=new Date().toISOString();save();
+    var bh=document.getElementById('backupHint');if(bh)bh.innerHTML='';
   }catch(e){alert('Export impossible dans cet aperçu. Ouvre le fichier dans un vrai navigateur.');}
 }
 function importData(input){
@@ -1170,7 +1173,7 @@ renderChips();renderTimeChips();renderFocusChips();renderTracks();applyTheme();r
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.toggle('on',el.id==='page-'+p));
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===p));
-  if(p==='semaine'){renderWeek();renderTrend();}
+  if(p==='semaine'){renderWeek();renderTrend();renderBackupHint();}
   window.scrollTo(0,0);
 }
 
@@ -1749,6 +1752,28 @@ function generateMob(){
     +pick.map(function(e,i){return '<div class="en-blk"><span class="bn">'+(i+1)+'</span><span><b>'+escapeHtml(e[0])+'</b><br><span style="color:var(--ink-soft);font-size:13px">'+escapeHtml(e[1])+'</span></span></div>';}).join('')
     +'</div>';
   buzz(15);
+}
+
+
+// ---- Stockage persistant + rappel de sauvegarde ----
+if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(function(){});}
+function daysSince(iso){if(!iso)return null;return Math.floor((Date.now()-new Date(iso).getTime())/86400000);}
+function snoozeBackup(){STORE.backupSnooze=new Date().toISOString();save();var el=document.getElementById('backupHint');if(el)el.innerHTML='';}
+function renderBackupHint(){
+  var el=document.getElementById('backupHint');if(!el)return;
+  var hasData=(STORE.endurance&&STORE.endurance.length)||(STORE.sessions&&STORE.sessions.length);
+  if(!hasData){el.innerHTML='';return;}
+  var dE=daysSince(STORE.lastExport);      // null = jamais exporté
+  var dS=daysSince(STORE.backupSnooze);
+  var due=(dE===null)||(dE>=7);
+  var snoozed=(dS!==null&&dS<3);
+  if(!due||snoozed){el.innerHTML='';return;}
+  var msg=(dE===null)?'Tes données ne sont jamais sorties de ce téléphone.':'Dernière sauvegarde : il y a '+dE+' jours.';
+  el.innerHTML='<div class="mini" style="border-color:var(--warn);display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+    +'<div style="flex:1;min-width:0"><b style="font-size:13.5px">💾 Pense à sauvegarder</b>'
+    +'<div style="font-size:12px;color:var(--ink-soft);margin-top:2px">'+msg+' Le fichier va dans tes Téléchargements.</div></div>'
+    +'<button class="allbtn" style="border-color:var(--accent);color:var(--accent);flex:none" onclick="exportData();renderBackupHint()">Exporter</button>'
+    +'<button class="allbtn" style="flex:none" onclick="snoozeBackup()">Plus tard</button></div>';
 }
 
 // ---- Ma séance du jour : l'app tranche ----
